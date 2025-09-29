@@ -4,53 +4,155 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Vue CDN di GitHub Pages</title>
-    <!-- Tailwind optional (hapus kalau tidak perlu) -->
+    <title>KasGue | Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
 
-<body class="bg-gray-50 text-gray-800">
-    <div id="app" class="max-w-xl mx-auto p-6">
-        <h1 class="text-2xl font-semibold mb-4">Halo, {{ name }} 👋</h1>
+<body class="bg-gray-50 text-gray-800" id="app">
+    <!-- Container -->
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <!-- Card -->
+        <div
+            class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
 
-        <div class="space-y-3">
-            <input v-model="name" placeholder="Ubah nama…" class="border rounded px-3 py-2 w-full">
-            <button @click="count++" class="px-4 py-2 rounded bg-blue-600 text-white">
-                Klik aku ({{ count }})
-            </button>
+            <!-- Left: Login form -->
+            <div class="p-6 sm:p-10">
+                <form class="space-y-6" @submit.prevent="onSubmit">
+                    <div class="mb-6">
+                        <!-- Branding -->
+                        <div class="flex flex-col">
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-2xl font-bold text-gray-800">
+                                    Kas<span class="text-red-500 font-bold">Gue</span>
+                                </span>
+                                <span class="text-sm text-gray-500 tracking-wide">by Manajemen Informatika</span>
+                            </div>
+                        </div>
 
-            <ul class="list-disc pl-6">
-                <li v-for="(t, i) in todos" :key="i">{{ t }}</li>
-            </ul>
-            <form @submit.prevent="addTodo">
-                <input v-model="newTodo" placeholder="Tambah todo…" class="border rounded px-3 py-2 mr-2">
-                <button class="px-3 py-2 bg-green-600 text-white rounded">Tambah</button>
-            </form>
+                        <!-- Separator -->
+                        <div class="mt-3 border-t-2 border-gray-200"></div>
+
+                        <!-- Section Title -->
+                        <div class="pt-4">
+                            <h1 class="text-2xl font-semibold text-gray-900">Masuk ke akun Anda</h1>
+                            <p class="mt-1 text-sm text-gray-500">
+                                Gunakan email dan kata sandi yang terdaftar untuk melanjutkan.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
+                        <input type="text" id="username" name="username" v-model.trim="form.username" required
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full px-3 py-2.5"
+                            placeholder="username Anda" />
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="password" class="text-sm font-medium text-gray-900">Password</label>
+                        </div>
+                        <input type="password" id="password" name="password" v-model="form.password" required
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full px-3 py-2.5"
+                            placeholder="••••••••" />
+                    </div>
+
+                    <button type="submit" :disabled="loading"
+                        class="w-full inline-flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed focus:ring-4 focus:ring-red-300 text-white text-sm font-medium px-5 py-2.5">
+                        <span v-if="!loading">Masuk</span>
+                        <span v-else>Mengirim...</span>
+                    </button>
+
+                    <!-- Area menampilkan hasil / error -->
+                    <div v-if="error" class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
+                        {{ error }}
+                    </div>
+                    <pre v-if="response"
+                        class="text-xs bg-gray-100 border border-gray-200 rounded-md p-3 overflow-auto max-h-64 whitespace-pre-wrap">{{ response }}</pre>
+
+                    <p class="text-sm text-gray-600">
+                        Belum punya akun?
+                        <a href="#" class="text-red-700 hover:underline">Daftar sekarang</a>
+                    </p>
+                </form>
+            </div>
+
+
+            <!-- Right: Image (only visible on md and up) -->
+            <div class="relative min-h-full hidden md:block">
+                <img src="/images/login_ornamen.png" alt="Ornamen login"
+                    class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+            </div>
+
+
         </div>
     </div>
 
+
+
     <!-- Vue 3 CDN (global build) -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     <script>
         const { createApp, ref } = Vue
 
         createApp({
             setup() {
-                const name = ref('Vue + GitHub Pages')
-                const count = ref(0)
-                const todos = ref(['Belajar Vue', 'Deploy ke GitHub Pages'])
-                const newTodo = ref('')
+                const form = ref({
+                    username: '',
+                    password: '',
+                })
+                const loading = ref(false)
+                const error = ref('')
+                const response = ref('')
 
-                const addTodo = () => {
-                    if (!newTodo.value.trim()) return
-                    todos.value.push(newTodo.value.trim())
-                    newTodo.value = ''
+                const onSubmit = async () => {
+                    error.value = ''
+                    response.value = ''
+                    loading.value = true
+                    try {
+                        const deploy_path = "https://kasgue-backend-production.up.railway.app/api/v1";
+                        const development_path = "http://localhost:3000/api/v1";
+
+                        const res = await fetch(deploy_path, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                // Tambahkan Authorization kalau perlu:
+                                // 'Authorization': 'Bearer <token>'
+                            },
+                            body: JSON.stringify({
+                                username: form.value.username,
+                                password: form.value.password,
+                            }),
+                            // Kalau butuh cookie/session dari backend:
+                            credentials: 'include',
+                        })
+
+                        // Ambil konten (bisa JSON atau text)
+                        const contentType = res.headers.get('content-type') || ''
+                        const data = contentType.includes('application/json')
+                            ? await res.json()
+                            : await res.text()
+
+                        if (!res.ok) {
+                            throw new Error(typeof data === 'string' ? data : (data.message || 'Login gagal'))
+                        }
+
+                        response.value = typeof data === 'string' ? data : JSON.stringify(data, null, 2)
+                    } catch (e) {
+                        error.value = e?.message || 'Terjadi kesalahan jaringan'
+                    } finally {
+                        loading.value = false
+                    }
                 }
 
-                return { name, count, todos, newTodo, addTodo }
+                return { form, loading, error, response, onSubmit }
             }
         }).mount('#app')
     </script>
+
 </body>
 
 </html>
