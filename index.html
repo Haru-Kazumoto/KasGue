@@ -35,9 +35,9 @@
 
                         <!-- Section Title -->
                         <div class="pt-4">
-                            <h1 class="text-2xl font-semibold text-gray-900">Masuk ke akun Anda</h1>
+                            <h1 class="text-xl font-semibold text-gray-900">Masuk ke akun Anda</h1>
                             <p class="mt-1 text-sm text-gray-500">
-                                Gunakan email dan kata sandi yang terdaftar untuk melanjutkan.
+                                Gunakan username dan kata sandi yang terdaftar untuk melanjutkan.
                             </p>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                         <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
                         <input type="text" id="username" name="username" v-model.trim="form.username" required
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full px-3 py-2.5"
-                            placeholder="username Anda" />
+                            placeholder="laba_laba_sunda" />
                     </div>
 
                     <div>
@@ -61,19 +61,20 @@
                     <button type="submit" :disabled="loading"
                         class="w-full inline-flex items-center justify-center rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed focus:ring-4 focus:ring-red-300 text-white text-sm font-medium px-5 py-2.5">
                         <span v-if="!loading">Masuk</span>
-                        <span v-else>Mengirim...</span>
+                        <span v-else>Sabar bro lagi proses...</span>
                     </button>
 
                     <!-- Area menampilkan hasil / error -->
                     <div v-if="error" class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-3">
                         {{ error }}
                     </div>
-                    <pre v-if="response"
-                        class="text-xs bg-gray-100 border border-gray-200 rounded-md p-3 overflow-auto max-h-64 whitespace-pre-wrap">{{ response }}</pre>
+                    <div v-if="response" class="text-sm text-blue-600 bg-blue-50 border border-blue-200 rounded-md p-3">
+                        {{ response }}</div>
 
                     <p class="text-sm text-gray-600">
-                        Belum punya akun?
-                        <a href="#" class="text-red-700 hover:underline">Daftar sekarang</a>
+                        Stalk the
+                        <a href="https://haru-kazumoto.github.io/ziaurrahman/" target="_blank"
+                            class="text-red-700 hover:underline">Developer</a>
                     </p>
                 </form>
             </div>
@@ -115,7 +116,7 @@
                         const deploy_path = "https://kasgue-backend-production.up.railway.app/api/v1";
                         const development_path = "http://localhost:3000/api/v1";
 
-                        const res = await fetch(deploy_path+"/auth/login", {
+                        const res = await fetch(development_path + "/auth/login", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -140,7 +141,23 @@
                             throw new Error(typeof data === 'string' ? data : (data.message || 'Login gagal'))
                         }
 
-                        response.value = typeof data === 'string' ? data : JSON.stringify(data, null, 2)
+                        response.value = typeof data === 'string' ? data : "Berhasil Masuk, sabar gw ganti halaman dulu"
+
+                        const user = data.user;
+
+                        if (data && data.user) {
+                            localStorage.setItem('user_data', JSON.stringify({
+                                username: user.username,
+                                email: user.email,
+                                fullname: user.fullname,
+                                major_name: user.major_name,
+                                major_code: user.major_code
+                            }));
+                        }
+
+                        setInterval(() => {
+                            window.location.href = "dashboard.html";
+                        }, 1700);
                     } catch (e) {
                         error.value = e?.message || 'Terjadi kesalahan jaringan'
                     } finally {
