@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Vue CDN di GitHub Pages</title>
+    <!-- Tailwind optional (hapus kalau tidak perlu) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+    <div id="app" class="max-w-xl mx-auto p-6">
+        <h1 class="text-2xl font-semibold mb-4">Halo, {{ name }} 👋</h1>
+
+        <div class="space-y-3">
+            <input v-model="name" placeholder="Ubah nama…" class="border rounded px-3 py-2 w-full">
+            <button @click="count++" class="px-4 py-2 rounded bg-blue-600 text-white">
+                Klik aku ({{ count }})
+            </button>
+
+            <ul class="list-disc pl-6">
+                <li v-for="(t, i) in todos" :key="i">{{ t }}</li>
+            </ul>
+            <form @submit.prevent="addTodo">
+                <input v-model="newTodo" placeholder="Tambah todo…" class="border rounded px-3 py-2 mr-2">
+                <button class="px-3 py-2 bg-green-600 text-white rounded">Tambah</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Vue 3 CDN (global build) -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp, ref } = Vue
+
+        createApp({
+            setup() {
+                const name = ref('Vue + GitHub Pages')
+                const count = ref(0)
+                const todos = ref(['Belajar Vue', 'Deploy ke GitHub Pages'])
+                const newTodo = ref('')
+
+                const addTodo = () => {
+                    if (!newTodo.value.trim()) return
+                    todos.value.push(newTodo.value.trim())
+                    newTodo.value = ''
+                }
+
+                return { name, count, todos, newTodo, addTodo }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
