@@ -115,7 +115,7 @@
                         const deploy_path = "https://kasgue-backend-production.up.railway.app/api/v1";
                         const development_path = "http://localhost:3000/api/v1";
 
-                        const res = await fetch(deploy_path, {
+                        const res = await fetch(deploy_path+"/auth/login", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
