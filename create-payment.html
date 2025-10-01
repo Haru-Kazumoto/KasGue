@@ -126,7 +126,9 @@
                                     class="text-red-600">*</span></label>
                             <input v-model.trim="paymentForm.payer_name" type="text" required
                                 placeholder="Contoh: Andi Saputra"
+                                @input="paymentForm.payer_name = paymentForm.payer_name.toUpperCase()"
                                 class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500" />
+
                         </div>
 
                         <!-- Jumlah (Rp) -->
@@ -219,7 +221,7 @@
                     paid_at: '',      // format YYYY-MM-DD
                     method: '',
                     type: '',
-                    status: 'PAID',
+                    status: 'INCOME',
                     reference: '',
                     notes: '',
                 })
@@ -271,12 +273,13 @@
                             paid_at: paymentForm.value.paid_at,      // "YYYY-MM-DD"
                             method: paymentForm.value.method,
                             type: paymentForm.value.type,
-                            status: paymentForm.value.status,
+                            status: 'INCOME',
                             reference: paymentForm.value.reference || null,
                             notes: paymentForm.value.notes || null,
+                            username: current_user.value.username
                         }
 
-                        const res = await fetch(`${API_BASE}/payments`, {
+                        const res = await fetch(`${API_BASE}/payments/create`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             credentials: 'include', // penting untuk session cookie
@@ -291,7 +294,7 @@
                             throw new Error(msg)
                         }
 
-                        formSuccess.value = 'Pembayaran berhasil disimpan.'
+                        formSuccess.value = "Oke berhasil, bentar gw simpen dulu...";
                         // Reset form (opsional)
                         paymentForm.value = {
                             payer_name: '',
@@ -299,14 +302,14 @@
                             paid_at: paymentForm.value.paid_at, // tetap hari ini
                             method: '',
                             type: '',
-                            status: 'PAID',
+                            status: '',
                             reference: '',
                             notes: '',
                         }
 
-                        // (Opsional) redirect ke detail:
-                        // window.location.href = `detail.html?id=${data.id}`
-                        // atau URL cantik via 404.html catch-all: /payment/${data.id}/detail
+                        setInterval(() => {
+                            window.location.href = 'income.html';
+                        }, 2000);
                     } catch (e) {
                         formError.value = e?.message || 'Terjadi kesalahan'
                     } finally {

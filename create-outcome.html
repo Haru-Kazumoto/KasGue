@@ -122,11 +122,13 @@
 
                         <!-- Nama Pembayar -->
                         <div class="flex flex-col gap-1">
-                            <label class="text-sm font-medium text-gray-700">Nama Pengeluaran <span
+                            <label class="text-sm font-medium text-gray-700">Judul Pengeluaran<span
                                     class="text-red-600">*</span></label>
                             <input v-model.trim="paymentForm.payer_name" type="text" required
-                                placeholder="Contoh: Andi Saputra"
+                                placeholder="Beli Truck"
+                                @input="paymentForm.payer_name = paymentForm.payer_name.toUpperCase()"
                                 class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500" />
+
                         </div>
 
                         <!-- Jumlah (Rp) -->
@@ -140,14 +142,28 @@
                                     }}</span></p>
                         </div>
 
+                        <!-- Metode Pembayaran -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-sm font-medium text-gray-700">Metode Penarikan<span
+                                    class="text-red-600">*</span></label>
+                            <select v-model="paymentForm.method" required
+                                class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500">
+                                <option disabled value="">Pilih metode…</option>
+                                <option value="CASH">Tunai (Cash)</option>
+                                <option value="BANK_TRANSFER">Transfer Bank</option>
+                                <option value="EWALLET">E-Wallet</option>
+                                <option value="QRIS">QRIS</option>
+                            </select>
+                        </div>
+
                         <!-- Tipe Pembayaran -->
                         <div class="flex flex-col gap-1">
-                            <label class="text-sm font-medium text-gray-700">Tipe Pengeluaran <span
+                            <label class="text-sm font-medium text-gray-700">Tipe Pengeluaran<span
                                     class="text-red-600">*</span></label>
                             <select v-model="paymentForm.type" required
                                 class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500">
                                 <option disabled value="">Pilih tipe…</option>
-                                <option value="KEBUTUHAN_KELAS">KEBUTUHAN KELAS</option>
+                                <option value="KAS">KAS</option>
                                 <option value="LAINNYA">Lainnya</option>
                             </select>
                         </div>
@@ -205,7 +221,7 @@
                     paid_at: '',      // format YYYY-MM-DD
                     method: '',
                     type: '',
-                    status: 'PAID',
+                    status: 'OUTCOME',
                     reference: '',
                     notes: '',
                 })
@@ -260,9 +276,10 @@
                             status: paymentForm.value.status,
                             reference: paymentForm.value.reference || null,
                             notes: paymentForm.value.notes || null,
+                            username: current_user.value.username
                         }
 
-                        const res = await fetch(`${API_BASE}/payments`, {
+                        const res = await fetch(`${API_BASE}/payments/create`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             credentials: 'include', // penting untuk session cookie
@@ -277,7 +294,8 @@
                             throw new Error(msg)
                         }
 
-                        formSuccess.value = 'Pembayaran berhasil disimpan.'
+                        formSuccess.value = "Oke berhasil, bentar gw simpen dulu...";
+
                         // Reset form (opsional)
                         paymentForm.value = {
                             payer_name: '',
@@ -285,23 +303,23 @@
                             paid_at: paymentForm.value.paid_at, // tetap hari ini
                             method: '',
                             type: '',
-                            status: 'PAID',
+                            status: 'OUTCOME',
                             reference: '',
                             notes: '',
                         }
 
-                        // (Opsional) redirect ke detail:
-                        // window.location.href = `detail.html?id=${data.id}`
-                        // atau URL cantik via 404.html catch-all: /payment/${data.id}/detail
+                        setInterval(() => {
+                            window.location.href = 'outcome.html';
+                        }, 2000);
                     } catch (e) {
-                        formError.value = e?.message || 'Terjadi kesalahan'
+                        formError.value = e?.message
                     } finally {
                         submitting.value = false
                     }
                 }
 
                 // tombol "Kembali" (kamu sudah punya @click=backRoute)
-                const backRoute = () => history.length > 1 ? history.back() : (window.location.href = 'outcome.html')
+                const backRoute = () => history.length > 1 ? history.back() : (window.location.href = 'dashboard.html')
 
                 // RETURN ke template
                 return {
